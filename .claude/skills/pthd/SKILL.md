@@ -29,6 +29,20 @@ Parse the user's request to extract:
 - `cc 2, gem 1` - Alternate syntax
 - `4` - Single number means all enabled tools with that count
 
+### Agent Name Placeholder
+
+Use `{{AGENT}}` in your prompt to get it replaced with the unique agent name for each process:
+- `cc-1`, `cc-2`, `cc-3` for Claude Code instances
+- `gem-1`, `gem-2`, `gem-3` for Gemini CLI instances
+- `codex-1`, `codex-2`, `codex-3` for Codex CLI instances
+
+**Example**: If the user says "save to `./tmp/{{AGENT}}_response.md`", each agent will save to a unique file:
+- cc-1 saves to `./tmp/cc-1_response.md`
+- gem-1 saves to `./tmp/gem-1_response.md`
+- codex-2 saves to `./tmp/codex-2_response.md`
+
+**IMPORTANT**: When the user's prompt mentions saving files with dynamic agent names (like `<agent>`, `$agent`, or similar patterns), automatically convert them to use `{{AGENT}}`.
+
 ## Workflow
 
 1. Parse the user request for prompt and tool specification

@@ -23,24 +23,32 @@ def build_procs(prompt: str, tools: dict[str, int]) -> dict:
     - cc: --dangerously-skip-permissions (no approval prompts)
     - gem: -y (yolo mode) + -i (interactive, right before prompt)
     - codex: --dangerously-bypass-approvals-and-sandbox
-    """
-    # Escape prompt for shell (single quotes -> '\'')
-    escaped = prompt.replace("'", "'\\''")
 
-    COMMANDS = {
-        "cc": f"claude --dangerously-skip-permissions '{escaped}'",
-        "gem": f"gemini -y -i '{escaped}'",
-        "codex": f"codex --dangerously-bypass-approvals-and-sandbox '{escaped}'",
-    }
+    Agent name placeholder:
+    - Use {{AGENT}} in your prompt to get replaced with the agent name (e.g., cc-1, gem-2)
+    - Example: "save to ./tmp/{{AGENT}}_response.md" becomes "./tmp/cc-1_response.md"
+    """
+    AGENT_PLACEHOLDER = "{{AGENT}}"
 
     procs = {}
     for tool, count in tools.items():
-        if tool not in COMMANDS:
+        if tool not in ["cc", "gem", "codex"]:
             continue
-        cmd_template = COMMANDS[tool]
         for i in range(1, count + 1):
             name = f"{tool}-{i}"
-            procs[name] = {"shell": cmd_template}
+            # Replace {{AGENT}} placeholder with actual agent name
+            agent_prompt = prompt.replace(AGENT_PLACEHOLDER, name)
+            # Escape prompt for shell (single quotes -> '\'')
+            escaped = agent_prompt.replace("'", "'\\''")
+
+            if tool == "cc":
+                cmd = f"claude --dangerously-skip-permissions '{escaped}'"
+            elif tool == "gem":
+                cmd = f"gemini -y -i '{escaped}'"
+            elif tool == "codex":
+                cmd = f"codex --dangerously-bypass-approvals-and-sandbox '{escaped}'"
+
+            procs[name] = {"shell": cmd}
 
     return {"procs": procs}
 
