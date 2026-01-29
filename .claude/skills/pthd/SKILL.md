@@ -31,17 +31,21 @@ Parse the user's request to extract:
 
 ### Agent Name Placeholder
 
-Use `{{AGENT}}` in your prompt to get it replaced with the unique agent name for each process:
-- `cc-1`, `cc-2`, `cc-3` for Claude Code instances
-- `gem-1`, `gem-2`, `gem-3` for Gemini CLI instances
-- `codex-1`, `codex-2`, `codex-3` for Codex CLI instances
+Use `{{AGENT}}` in prompts - replaced with unique agent name (`cc-1`, `gem-2`, etc.).
+When user mentions saving files with dynamic names (`<agent>`, `$agent`), convert to `{{AGENT}}`.
 
-**Example**: If the user says "save to `./tmp/{{AGENT}}_response.md`", each agent will save to a unique file:
-- cc-1 saves to `./tmp/cc-1_response.md`
-- gem-1 saves to `./tmp/gem-1_response.md`
-- codex-2 saves to `./tmp/codex-2_response.md`
+### Parallel Summary Prompts
 
-**IMPORTANT**: When the user's prompt mentions saving files with dynamic agent names (like `<agent>`, `$agent`, or similar patterns), automatically convert them to use `{{AGENT}}`.
+- IF: The user requests parallel agents with summary context (e.g., "include summary", "with context").
+- THEN:
+  - Read `.claude/skills/pthd/prompts/parallel_agent_prompt.md` as a template.
+  - Fill in `<fill_in_conversation_summary_here>` with relevant conversation history.
+  - Fill in `<fill_in_task_here>` with the user's task verbatim.
+  - Pass the filled prompt to each parallel agent.
+  - IMPORTANT: Fill the template IN YOUR MEMORY, don't modify the file.
+- EXAMPLES:
+  - "pthd 3 cc: build a todo app, include summary"
+  - "spawn agents with context: refactor this code"
 
 ## Workflow
 
